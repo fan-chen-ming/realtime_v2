@@ -1,9 +1,7 @@
 package com.cm.dwd.log;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
 import com.cm.base.BaseApp;
 import com.cm.constant.Constant;
 import com.cm.util.DateFormatUtil;
@@ -25,8 +23,8 @@ import org.apache.flink.util.OutputTag;
 
 
 /**
- * @Package com.jiao.dwd.log.split.DwdBaseLog
- * @Author xinyi.jiao
+ * @Package com.cm.dwd.log.DwdBaseLog
+ * @Author chen.ming
  * @Date 2025/4/10 16:25
  * @description: 日志分流 / 用户行为
  */
@@ -64,13 +62,11 @@ public class DwdBaseLog  extends BaseApp {
         // 使用Flink的状态编程完成修复
         SingleOutputStreamOperator<JSONObject> fiexdDs = keyedDs.map(new RichMapFunction<JSONObject, JSONObject>() {
             private ValueState<String> listVisitDateState;
-
             @Override
             public void open(Configuration parameters) throws Exception {
                 ValueStateDescriptor<String> valueStateDescriptor = new ValueStateDescriptor<String>("listVisitDateState", String.class);
                 listVisitDateState = getRuntimeContext().getState(valueStateDescriptor);
             }
-
             @Override
             public JSONObject map(JSONObject jsonObj) throws Exception {
                 //获取is_new的值
@@ -108,7 +104,6 @@ public class DwdBaseLog  extends BaseApp {
 //        fiexdDs.print();
 //        4> {"common":{"ar":"18","uid":"4","os":"Android 12.0","ch":"360","is_new":"0","md":"xiaomi 13","mid":"mid_359","vc":"v2.1.134","ba":"xiaomi","sid":"b9b29ef1-55e9-4d8f-a536-6a9e63bf65b0"},"page":{"page_id":"activity1111","refer_id":"1","during_time":11569},"displays":[{"pos_seq":0,"item":"8","item_type":"sku_id","pos_id":8},{"pos_seq":1,"item":"26","item_type":"sku_id","pos_id":8},{"pos_seq":2,"item":"24","item_type":"sku_id","pos_id":8},{"pos_seq":3,"item":"9","item_type":"sku_id","pos_id":8},{"pos_seq":4,"item":"29","item_type":"sku_id","pos_id":8},{"pos_seq":5,"item":"30","item_type":"sku_id","pos_id":8},{"pos_seq":6,"item":"34","item_type":"sku_id","pos_id":8},{"pos_seq":7,"item":"30","item_type":"sku_id","pos_id":8},{"pos_seq":8,"item":"30","item_type":"sku_id","pos_id":8},{"pos_seq":9,"item":"3","item_type":"sku_id","pos_id":8},{"pos_seq":10,"item":"24","item_type":"sku_id","pos_id":8},{"pos_seq":11,"item":"21","item_type":"sku_id","pos_id":8},{"pos_seq":12,"item":"23","item_type":"sku_id","pos_id":8},{"pos_seq":13,"item":"7","item_type":"sku_id","pos_id":8},{"pos_seq":14,"item":"27","item_type":"sku_id","pos_id":8},{"pos_seq":15,"item":"11","item_type":"sku_id","pos_id":8},{"pos_seq":16,"item":"23","item_type":"sku_id","pos_id":8},{"pos_seq":17,"item":"34","item_type":"sku_id","pos_id":8},{"pos_seq":18,"item":"22","item_type":"sku_id","pos_id":8},{"pos_seq":19,"item":"12","item_type":"sku_id","pos_id":8},{"pos_seq":20,"item":"30","item_type":"sku_id","pos_id":8},{"pos_seq":21,"item":"30","item_type":"sku_id","pos_id":8},{"pos_seq":22,"item":"8","item_type":"sku_id","pos_id":8},{"pos_seq":0,"item":"33","item_type":"sku_id","pos_id":9},{"pos_seq":1,"item":"28","item_type":"sku_id","pos_id":9}],"ts":1744037187774}
         //TODO 分流 错误日志-错误侧输出流启动日志-启动侧输出流曝光日志-曝光侧输出流动作日志-动作侧输出流页面日志-主流
-
     //定义侧输出流标签
         OutputTag<String> errTag = new OutputTag<String>("errTag") {};
         OutputTag<String> startTag = new OutputTag<String>( "startTag") {};
@@ -135,7 +130,6 @@ public class DwdBaseLog  extends BaseApp {
                             JSONObject commonjsonObj = jsonObj.getJSONObject("common");
                             JSONObject pagejsonObj = jsonObj.getJSONObject("page");
                             Long ts = jsonObj.getLong("ts");
-
                             //曝光日志
                             JSONArray displayArr = jsonObj.getJSONArray("displays");
                             if (displayArr != null && displayArr.size() > 0) {

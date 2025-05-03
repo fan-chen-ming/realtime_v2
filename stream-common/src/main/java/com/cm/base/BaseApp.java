@@ -1,6 +1,5 @@
 package com.cm.base;
-import com.jiao.constant.Constant;
-import com.jiao.util.FlinkSourceUtil;
+import com.cm.constant.Constant;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
