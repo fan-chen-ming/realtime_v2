@@ -35,7 +35,7 @@ import java.util.*;
  * @Package com.cm.dwd.DwdBaseDb
  * @Author chen.ming
  * @Date 2025/4/13 19:06
- * @description: 开发思路分析
+ * @description: 开发思路分析的 /从Kafka读取数据流，并根据MySQL中的配置动态地处理这些数据。处理过程中涉及到了数据的解析、过滤、转换以及广播状态的应用。
  */
 public class DwdBaseDb extends BaseApp {
     public static void main(String[] args) throws Exception {
@@ -52,6 +52,7 @@ public class DwdBaseDb extends BaseApp {
                     @Override
                     public void processElement(String s, ProcessFunction<String, JSONObject>.Context ctx, Collector<JSONObject> out) throws Exception {
                         try {
+                            //如果消息的操作类型（op字段）不是以bootstrap-开头，则将该JSON对象传递给后续操作符
                             JSONObject jsonObj = JSON.parseObject(s);
                             String type = jsonObj.getString("op");
                             if (!type.startsWith("bootstrap-")) {
@@ -72,6 +73,7 @@ public class DwdBaseDb extends BaseApp {
         MySqlSource<String> mySqlSource = FlinkSourceUtil.getMysqlSourceUtil("realtime_v1_config", "table_process_dwd");
         DataStreamSource<String> mysqStrDS = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "mysql_source");
         SingleOutputStreamOperator<TableProcessDwd> tpDS = mysqStrDS.map(
+                //从MySQL数据库中读取配置信息，并将其映射为TableProcessDwd对象。这些配置信息用于决定如何处理来自Kafka的消息。
                 new MapFunction<String, TableProcessDwd>() {
                     @Override
                     public TableProcessDwd map(String s) throws Exception {
@@ -92,7 +94,7 @@ public class DwdBaseDb extends BaseApp {
 //        tpDS.print();
 //        TableProcessDwd(sourceTable=favor_info, sourceType=insert, sinkTable=dwd_interaction_favor_add, sinkColumns=id,user_id,sku_id,create_time, op=r)
 //        TableProcessDwd(sourceTable=coupon_use, sourceType=update, sinkTable=dwd_tool_coupon_use, sinkColumns=id,coupon_id,user_id,order_id,using_time,used_time,coupor, op=r)
-
+//        将MySQL中的配置信息作为广播状态，以便在处理每个Kafka消息时都能访问到最新的配置。
         MapStateDescriptor<String, TableProcessDwd> mapStateDescriptor
                 = new MapStateDescriptor<String, TableProcessDwd>("mapStateDescriptor",String.class, TableProcessDwd.class);
         BroadcastStream<TableProcessDwd> broadcastDS = tpDS.broadcast(mapStateDescriptor);
@@ -173,6 +175,7 @@ public class DwdBaseDb extends BaseApp {
 //        splitDS1.sinkTo(FlinkSinkUtil.getFlinkSinkUtil());
 
     }
+    //这个辅助方法用于删除JSON对象中不需要的列，只保留配置中指定的列。
     private static void deleteNoeedColumns(JSONObject dataJsonObj, String sinkColumns) {
         List<String> columnList = Arrays.asList(sinkColumns.split(","));
 

@@ -1,6 +1,7 @@
 package com.cm.util;
 
-import com.jiao.constant.Constant;
+
+import com.cm.constant.Constant;
 
 /**
  * @Package com.cm.util.SQLUtil

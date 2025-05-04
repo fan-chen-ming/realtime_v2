@@ -1,7 +1,6 @@
 package com.cm.constant;
 
 import com.google.common.base.CaseFormat;
-import com.jiao.constant.Constant;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.sql.*;

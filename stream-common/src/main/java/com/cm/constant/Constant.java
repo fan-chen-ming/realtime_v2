@@ -20,7 +20,7 @@ public class Constant {
     public static final String HBASE_NAMESPACE = "ns_chenming";
 
     public static final String MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
-    public static final String MYSQL_URL = "jdbc:mysql://10.160.60.17?useSSL=false";
+    public static final String MYSQL_URL = "jdbc:mysql://10.160.60.17:3306?useSSL=false";
 
     public static final String TOPIC_DWD_TRAFFIC_START = "dwd_traffic_start_chenming";
     public static final String TOPIC_DWD_TRAFFIC_ERR = "dwd_traffic_err_chenming";

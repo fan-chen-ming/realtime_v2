@@ -53,13 +53,13 @@ public class DwdInteractionCommentInfo{
                 "proc_time " +
                 "from db where source['table'] = 'comment_info'");
 //        tenv.toChangelogStream(table1).print("过滤===>");
-//
+//通过SQL查询过滤出source['table']为comment_info的消息，并提取其中的相关字段。然后将结果注册为一个临时视图comment_info
         tenv.createTemporaryView("comment_info",table1);
 // TODO 关联数据
         tenv.executeSql("CREATE TABLE hbase (\n" +
-                " dic_code String,\n" +
-                " info ROW<dic_name String>,\n" +
-                " PRIMARY KEY (dic_code) NOT ENFORCED\n" +
+                " dic_code String,\n" + // 字典码
+                " info ROW<dic_name String>,\n" + // 包含字典名称的信息行
+                " PRIMARY KEY (dic_code) NOT ENFORCED\n" + //主键为dic_code，但不强制执行唯一性约束
                 ") WITH (\n" +
                 " 'connector' = 'hbase-2.2',\n" +
                 " 'table-name' = 'ns_chenming:dim_base_dic',\n" +
@@ -81,9 +81,9 @@ public class DwdInteractionCommentInfo{
                 "    id string,\n" +
                 "    user_id string,\n" +
                 "    sku_id string,\n" +
-                "    appraise string,\n" +
-                "    appraise_name string,\n" +
-                "    comment_txt string,\n" +
+                "    appraise string,\n" + // 评分
+                "    appraise_name string,\n" + // 评分名称
+                "    comment_txt string,\n" + // 评论内容为
                 "    ts bigint,\n" +
                 "    PRIMARY KEY (id) NOT ENFORCED\n" +
                 ") " + SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));

@@ -2,11 +2,11 @@
 ./flink run-application \
 -d \
 -t yarn-application \
--ynm DbusCdc2DimHbase \
+-ynm Test01_FlinkCDC \
 -yjm 900 \
 -ytm 900 \
 -yqu root.default \
--c realtime-retail-v1.com.jiao.dim.app /opt/2207A/xinyi_jiao/flume/realtime-retail-v1-1.0-SNAPSHOT-shaded.jar
+-c com.cm.dim.Test01_FlinkCDC /opt/2207A/chenming/jars/stream-realtime-1.0-SNAPSHOT.jar
 
 # 应用模式提交任务 HDFS提交
 ./flink run-application \

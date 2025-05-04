@@ -1,8 +1,8 @@
 package com.cm.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cm.constant.Constant;
 import com.google.common.base.CaseFormat;
-import com.jiao.constant.Constant;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
