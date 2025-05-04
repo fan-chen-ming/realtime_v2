@@ -6,8 +6,8 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 /**
- * @Package com.jiao.dwd.app.DwdTradeOrderPaySucDetail
- * @Author xinyi.jiao
+ * @Package com.cm.dwd.DwdTradeOrderPaySucDetail
+ * @Author chen.ming
  * @Date 2025/4/13 18:42
  * @description: 交易域支付成功事务事实表
  */

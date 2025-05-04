@@ -6,8 +6,8 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 /**
- * @Package com.jiao.dwd.app.DwdTradeOrderCancelDetail
- * @Author xinyi.jiao
+ * @Package com.cm.dwd.DwdTradeOrderCancelDetail
+ * @Author chen.ming
  * @Date 2025/4/11 19:00
  * @description: 取消订单表
  */

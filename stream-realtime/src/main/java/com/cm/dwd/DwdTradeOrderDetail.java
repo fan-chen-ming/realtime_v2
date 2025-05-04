@@ -7,8 +7,8 @@ import org.apache.flink.table.api.Table;
 
 
 /**
- * @Package com.jiao.dwd.app.DwdTradeOrderDetail
- * @Author xinyi.jiao
+ * @Package com.cm.dwd.DwdTradeOrderDetail
+ * @Author chen.ming
  * @Date 2025/4/11 15:30
  * @description: 订单表 订单明细(主表) 订单明细活动 订单明细优惠券 下单事实表
  */

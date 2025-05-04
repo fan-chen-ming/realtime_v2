@@ -172,7 +172,7 @@ public class DimApp {
         System.out.println(broadcastDS);
         //将主流业务数据和广播流配置信息进行关联---connect
         BroadcastConnectedStream<JSONObject, TableProcessDim> connectDS = jsonObjDS.connect(broadcastDS);
-// 10.处理关联后的数据（判断是否为维度）
+        // 10.处理关联后的数据（判断是否为维度）
 
 
         SingleOutputStreamOperator<Tuple2<JSONObject,TableProcessDim>> dimDS = connectDS.process(
@@ -190,9 +190,9 @@ public class DimApp {
 
         env.execute();
     }
- //过滤掉不需要用的字段
- //dataJson0bj {"tm_name":"Redmi", "create_time":"2021-12-14 00:00:00", "logo_url": "555", "id":1}
-//sinkColumns id,tm_name
+    //过滤掉不需要用的字段
+    //dataJson0bj {"tm_name":"Redmi", "create_time":"2021-12-14 00:00:00", "logo_url": "555", "id":1}
+    //sinkColumns id,tm_name
     private static void deleteNeedColumns(JSONObject date, String sinkColumns) {
         List<String> coulumlist = Arrays.asList(sinkColumns.split(","));
         Set<Map.Entry<String, Object>> entries = date.entrySet();
