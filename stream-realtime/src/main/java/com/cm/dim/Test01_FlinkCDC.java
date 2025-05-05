@@ -32,7 +32,7 @@ public class Test01_FlinkCDC {
         prop.put("useSSL","false");
         prop.put("decimal.handling.mode","double");
         prop.put("time.precision.mode","connect");
-        prop.setProperty("scan.incremental.snapshot.chunk.key-column","id");
+        prop.setProperty("scan.incremental.snapshot.chunk.key-column","id");//提高并发 分片主键 控制快照分片粒度
         // 构建 MySQL CDC 源
         MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
                 .hostname("10.160.60.17")

@@ -37,7 +37,7 @@ public class Constant {
     public static final String TOPIC_DWD_USER_REGISTER = "dwd_user_register_chenming";
 
 
-    public static final String DORIS_FE_NODES = "10.39.48.33:8030";
+    public static final String DORIS_FE_NODES = "10.160.60.14:8030";
 
     public static final String DORIS_DATABASE = "dev_chen_ming_v1";
 }

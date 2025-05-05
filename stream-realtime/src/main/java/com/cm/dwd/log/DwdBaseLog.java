@@ -55,7 +55,7 @@ public class DwdBaseLog  extends BaseApp {
 //        dirtyDs.print("脏数据");
 //        定义侧输出流标签
 //        将侧输出流中的脏数据写到kafka主题中
-//        FlinkSinkUtil.getFlinkSinkUtil("xinyi_jiao_zang");
+//        FlinkSinkUtil.getFlinkSinkUtil("chenming_zang");
 //        TODO 对新老访客标记进行修复
 //        按照设备id进行分
         KeyedStream<JSONObject, String> keyedDs = jsonObjDS.keyBy(jsonObject -> jsonObject.getJSONObject("common").getString("mid"));

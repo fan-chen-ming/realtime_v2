@@ -25,10 +25,10 @@ public class DwdTradeOrderRefund {
                 "CREATE TABLE db (\n" +
                 "  `before` MAP<string,string>,\n" +
                 "  `after` Map<String,String>,\n" +
-                "   `source` Map<String,String>,\n" +
+                "  `source` Map<String,String>,\n" +
                 "  `op`  String,\n" +
                 "  `ts_ms`  bigint,\n" +
-                "  `proc_time`  AS proctime()\n "+
+                "  `proc_time` AS proctime()\n "+
                 ") WITH (\n" +
                 "  'connector' = 'kafka',\n" +
                 "  'topic' = 'chenming_db',\n" +
@@ -109,24 +109,24 @@ public class DwdTradeOrderRefund {
                 tenv.toChangelogStream(result).print();
 //
 //        // 5. 写出到 kaf ka
-//        tenv.executeSql(
-//                "create table dwd_trade_order_refund (" +
-//                        "sku_id string," +
-//                        "province_id string," +
-//                        "date_id string," +
-//                        "create_time string," +
-//                        "refund_type_code string," +
-//                        "refund_type_name string," +
-//                        "refund_reason_type_code string," +
-//                        "refund_reason_type_name string," +
-//                        "refund_reason_txt string," +
-//                        "refund_num string," +
-//                        "refund_amount string," +
-//                        "ts bigint ," +
-//                        "PRIMARY KEY (id) NOT ENFORCED " +
-//                        ")" + SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_TRADE_ORDER_REFUND));
+        tenv.executeSql(
+                "create table dwd_trade_order_refund (" +
+                        "sku_id string," +
+                        "province_id string," +
+                        "date_id string," +
+                        "create_time string," +
+                        "refund_type_code string," +
+                        "refund_type_name string," +
+                        "refund_reason_type_code string," +
+                        "refund_reason_type_name string," +
+                        "refund_reason_txt string," +
+                        "refund_num string," +
+                        "refund_amount string," +
+                        "ts bigint ," +
+                        "PRIMARY KEY (id) NOT ENFORCED " +
+                        ")" + SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_TRADE_ORDER_REFUND));
 
-//        result.executeInsert("dwd_trade_order_refund");
+        result.executeInsert("dwd_trade_order_refund");
 
         env.execute();
     }

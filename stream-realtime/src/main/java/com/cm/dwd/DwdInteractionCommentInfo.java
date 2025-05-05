@@ -12,7 +12,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @Package com.cm.dwd.DwdInteractionCommentInfo
  * @Author chen.ming
  * @Date 2025/4/11 10:32
- * @description: 加购事实表
+ * @description: 用户评论表
  */
 public class DwdInteractionCommentInfo{
     @SneakyThrows
@@ -50,7 +50,7 @@ public class DwdInteractionCommentInfo{
                 "after['appraise'] as appraise," +
                 "after['comment_txt'] as comment_txt," +
                 "ts_ms as ts," +
-                "proc_time " +
+                "proc_time " + //添加 proc_time 字段用于后续窗口计算或事件时间处理；
                 "from db where source['table'] = 'comment_info'");
 //        tenv.toChangelogStream(table1).print("过滤===>");
 //通过SQL查询过滤出source['table']为comment_info的消息，并提取其中的相关字段。然后将结果注册为一个临时视图comment_info
@@ -70,13 +70,19 @@ public class DwdInteractionCommentInfo{
 //        tenv.toChangelogStream(table2).print();
 //
         Table table3 = tenv.sqlQuery("SELECT  " +
-                " id,user_id,sku_id,appraise,dic.dic_name as appraise_name,comment_txt,ts \n" +
+                " id," +
+                "user_id," +
+                "sku_id," +
+                "appraise," +
+                "dic.dic_name as appraise_name," + //评分名称
+                "comment_txt," +
+                "ts \n" +
                 "FROM comment_info AS c \n" +
                 "  left join hbase as dic \n" +
-                "    ON c.appraise = dic.dic_code;");
+                "  ON c.appraise = dic.dic_code;");
         table3.execute().print();
 //
-//
+
         tenv.executeSql("CREATE TABLE "+ Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO+" (\n" +
                 "    id string,\n" +
                 "    user_id string,\n" +
@@ -87,8 +93,8 @@ public class DwdInteractionCommentInfo{
                 "    ts bigint,\n" +
                 "    PRIMARY KEY (id) NOT ENFORCED\n" +
                 ") " + SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));
-        // 写入
-//        table3.executeInsert(Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO);
+//         写入
+        table3.executeInsert(Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO);
         Table table4 = tenv.sqlQuery("select * from   dwd_interaction_comment_info_chenming ");
         tenv.toChangelogStream(table4).print();
         env.execute();

@@ -129,35 +129,35 @@ public class DwdTradeOrderPaySucDetail {
         tenv.toChangelogStream(result).print();
 
         //TODO 将关联的结果写到kafka主题中
-//        tenv.executeSql("create table dwd_trade_order_payment_success(" +
-//                "order_detail_id string," +
-//                "order_id string," +
-//                "user_id string," +
-//                "sku_id string," +
-//                "sku_name string," +
-//                "province_id string," +
-//                "activity_id string," +
-//                "activity_rule_id string," +
-//                "coupon_id string," +
-//                "payment_type_code string," +
-//                "payment_type_name string," +
-//                "callback_time string," +
-//                "sku_num string," +
-//                "split_original_amount string," +
-//                "split_activity_amount string," +
-//                "split_coupon_amount string," +
-//                "split_payment_amount string," +
-//                "ts bigint ," +
-//                "PRIMARY KEY (order_detail_id) NOT ENFORCED " +
-//                ") " +
-//                " WITH (\n" +
-//                "  'connector' = 'upsert-kafka',\n" +
-//                "  'topic' = 'dwd_trade_order_payment_success_chenming',\n" +
-//                "  'properties.bootstrap.servers' = 'cdh02:9092',\n" +
-//                "  'key.format' = 'json',\n" +
-//                "  'value.format' = 'json'\n" +
-//                ")");
-//        result.executeInsert("dwd_trade_order_payment_success");
+        tenv.executeSql("create table dwd_trade_order_payment_success(" +
+                "order_detail_id string," +
+                "order_id string," +
+                "user_id string," +
+                "sku_id string," +
+                "sku_name string," +
+                "province_id string," +
+                "activity_id string," +
+                "activity_rule_id string," +
+                "coupon_id string," +
+                "payment_type_code string," +
+                "payment_type_name string," +
+                "callback_time string," +
+                "sku_num string," +
+                "split_original_amount string," +
+                "split_activity_amount string," +
+                "split_coupon_amount string," +
+                "split_payment_amount string," +
+                "ts bigint ," +
+                "PRIMARY KEY (order_detail_id) NOT ENFORCED " +
+                ") " +
+                " WITH (\n" +
+                "  'connector' = 'upsert-kafka',\n" +
+                "  'topic' = 'dwd_trade_order_payment_success_chenming',\n" +
+                "  'properties.bootstrap.servers' = 'cdh02:9092',\n" +
+                "  'key.format' = 'json',\n" +
+                "  'value.format' = 'json'\n" +
+                ")");
+        result.executeInsert("dwd_trade_order_payment_success");
 
         env.execute();
     }

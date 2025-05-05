@@ -155,9 +155,12 @@ public class DwdBaseDb extends BaseApp {
                     public void processBroadcastElement(TableProcessDwd tp, BroadcastProcessFunction<JSONObject, TableProcessDwd, Tuple2<JSONObject,TableProcessDwd>>.Context ctx, Collector<Tuple2<JSONObject,TableProcessDwd>> out) throws Exception {
                         String op = tp.getOp();
 
+                        //获取广播状态存储对象
                         BroadcastState<String, TableProcessDwd> broadcastState = ctx.getBroadcastState(mapStateDescriptor);
+                        //获取当前配置对应的源表名，作为 key 存入广播状态。
                         String sourceTable = tp.getSourceTable();
                         if ("d".equals(op)){
+                            //如果是删除操作（op="d"），则从广播状态和本地缓存中移除该表的配置
                             broadcastState.remove(sourceTable);
                             configMap.remove(sourceTable);
                         }else {
@@ -167,13 +170,12 @@ public class DwdBaseDb extends BaseApp {
                     }
                 }
         );
-        splitDS.print();
+//        splitDS.print();
 
 //        SingleOutputStreamOperator<Tuple2<JSONObject, TableProcessDwd>> splitDS1 = connectDS.process(new BaseDbTableProcessFunction(mapStateDescriptor));
 ////        splitDS1.print();
 ////
 //        splitDS1.sinkTo(FlinkSinkUtil.getFlinkSinkUtil());
-
     }
     //这个辅助方法用于删除JSON对象中不需要的列，只保留配置中指定的列。
     private static void deleteNoeedColumns(JSONObject dataJsonObj, String sinkColumns) {

@@ -75,7 +75,6 @@ public class DimApp {
 //        kafkaDs.print();
         //保证消费的精准一次性，需要手动维护偏移量
         //TODO 4.对业务流中数据类型进行转换
-
         SingleOutputStreamOperator<JSONObject> jsonObjDS = kafkaDs.process(new ProcessFunction<String, JSONObject>() {
             @Override
             public void processElement(String s, ProcessFunction<String, JSONObject>.Context context, Collector<JSONObject> collector) throws Exception {
@@ -85,13 +84,13 @@ public class DimApp {
                 String data = object.getString("after");
                 if ("realtime_v1".equals(db)
                         && ("c".equals(type)
-                        || "u".equals(type)
-                        || "d".equals(type)
-                        || "r".equals(type))
+                        ||"u".equals(type)
+                        ||"d".equals(type)
+                        ||"r".equals(type))
                         && data != null
                         && data.length() > 2
-                ) {
-                    collector.collect(object);
+                ){
+                  collector.collect(object);
                 }
             }
         });
@@ -99,13 +98,14 @@ public class DimApp {
 //       {"op":"r","after":{"activity_name":"小米手机专场","start_time":1642035714000,"create_time":1653609600000,"activity_type":"3101","activity_desc":"小米手机满减2","end_time":1687132800000,"id":1},"source":{"server_id":0,"version":"1.9.7.Final","file":"","connector":"mysql","pos":0,"name":"mysql_binlog_source","row":0,"ts_ms":0,"snapshot":"false","db":"dev_realtime_v1_xinyi_jiao","table":"activity_info"},"ts_ms":1744097400031}
 //       TODO5.使用FlinkCDC读取配置表中的配置信息
 
-//       5.1创建MySQLSource对象 //优化 使用工具类
+//       5.1创建MySQLSource对象
+//       优化 使用工具类
         MySqlSource<String> mySqlSource = FlinkSourceUtil.getMysqlSourceUtil("realtime_v1_config", "table_process_dim");
         //读出数据 封装流
         DataStreamSource<String> ds1 = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "mysql_source");
 //          ds1.print("============>");
-//        {"before":null,"after":{"source_table":"coupon_range","sink_table":"dim_coupon_range","sink_family":"info","sink_columns":"id,coupon_id,range_type,range_id","sink_row_key":"id"},"source":{"version":"1.9.7.Final","connector":"mysql","name":"mysql_binlog_source","ts_ms":0,"snapshot":"false","db":"config_all","sequence":null,"table":"table_process_dim","server_id":0,"gtid":null,"file":"","pos":0,"row":0,"thread":null,"query":null},"op":"r","ts_ms":1744111870600,"transaction":null}
-//TOD06.对配置流中的数据类型进行转换 jsonStr->实体类对象
+//{"before":null,"after":{"source_table":"coupon_range","sink_table":"dim_coupon_range","sink_family":"info","sink_columns":"id,coupon_id,range_type,range_id","sink_row_key":"id"},"source":{"version":"1.9.7.Final","connector":"mysql","name":"mysql_binlog_source","ts_ms":0,"snapshot":"false","db":"config_all","sequence":null,"table":"table_process_dim","server_id":0,"gtid":null,"file":"","pos":0,"row":0,"thread":null,"query":null},"op":"r","ts_ms":1744111870600,"transaction":null}
+// TOD06.对配置流中的数据类型进行转换 jsonStr->实体类对象
         SingleOutputStreamOperator<TableProcessDim> tpDs = ds1.map(new MapFunction<String, TableProcessDim>() {
             @Override
             public TableProcessDim map(String jsonStr) throws Exception {
@@ -122,11 +122,11 @@ public class DimApp {
                 return tableProcessDim;
             }
         }).setParallelism(1);
-//        tpDs.print("封装数据==========>");
-//        TableProcessDim(sourceTable=activity_info, sinkTable=dim_activity_info, sinkColumns=id,activity_name,activity_type,activity_desc,start_time,end_time,create_time, sinkFamily=info, sinkRowKey=id, op=r)
+//      tpDs.print("封装数据==========>");
+//      TableProcessDim(sourceTable=activity_info, sinkTable=dim_activity_info, sinkColumns=id,activity_name,activity_type,activity_desc,start_time,end_time,create_time, sinkFamily=info, sinkRowKey=id, op=r)
 
-        // 根据配置表中的配置信息到HBase中执行建表或者删除表操作
-      tpDs= tpDs.map(
+//      根据配置表中的配置信息到HBase中执行建表或者删除表操作
+       tpDs= tpDs.map(
                 new RichMapFunction<TableProcessDim, TableProcessDim>() {
                     private Connection hbaseCon;
             @Override
@@ -182,17 +182,15 @@ public class DimApp {
         dimDS.print("数据======================>");
 
         //将维度数据同步到HBase表中  //优化后
-         dimDS.addSink(
-                 new HBaseSinkFunction()
-         );
+         dimDS.addSink(new HBaseSinkFunction());
 
 
 
         env.execute();
     }
-    //过滤掉不需要用的字段
-    //dataJson0bj {"tm_name":"Redmi", "create_time":"2021-12-14 00:00:00", "logo_url": "555", "id":1}
-    //sinkColumns id,tm_name
+     //过滤掉不需要用的字段
+     //dataJson0bj {"tm_name":"Redmi", "create_time":"2021-12-14 00:00:00", "logo_url": "555", "id":1}
+     //sinkColumns id,tm_name
     private static void deleteNeedColumns(JSONObject date, String sinkColumns) {
         List<String> coulumlist = Arrays.asList(sinkColumns.split(","));
         Set<Map.Entry<String, Object>> entries = date.entrySet();
