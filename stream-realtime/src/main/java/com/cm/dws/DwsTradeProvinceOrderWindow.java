@@ -48,18 +48,18 @@ public class DwsTradeProvinceOrderWindow{
     public static void main(String[] args) {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-        //TODO 2.检查点相关的设置
-        env.enableCheckpointing(5000L, CheckpointingMode.EXACTLY_ONCE);
-        //2.1 开启检查点
-        //2.2 设置检查点超时时间
-        env.getCheckpointConfig().setCheckpointTimeout(60000L);
-        //2.3 设置job取消后检查点是否保留
-        env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
-        //2.4 设置两个检查点之间最小时间间隔
-        env.getCheckpointConfig().setMinPauseBetweenCheckpoints(2000L);
-        //2.5 设置重启策略
-        //env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,3000L));
-        env.setRestartStrategy(RestartStrategies.failureRateRestart(3, Time.days(30),Time.seconds(3)));
+//        //TODO 2.检查点相关的设置
+//        env.enableCheckpointing(5000L, CheckpointingMode.EXACTLY_ONCE);
+//        //2.1 开启检查点
+//        //2.2 设置检查点超时时间
+//        env.getCheckpointConfig().setCheckpointTimeout(60000L);
+//        //2.3 设置job取消后检查点是否保留
+//        env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
+//        //2.4 设置两个检查点之间最小时间间隔
+//        env.getCheckpointConfig().setMinPauseBetweenCheckpoints(2000L);
+//        2.5 设置重启策略
+//        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,3000L));
+//        env.setRestartStrategy(RestartStrategies.failureRateRestart(3, Time.days(30),Time.seconds(3)));
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers("cdh02:9092")
                 .setTopics("dwd_trade_order_detail")
@@ -80,7 +80,7 @@ public class DwsTradeProvinceOrderWindow{
                     }
                 }
         );
-//        jsonObjDS.print();
+        jsonObjDS.print();
         //TODO 2.按照唯一键(订单明细的id)进行分组
         KeyedStream<JSONObject, String> orderDetailIdKeyedDS = jsonObjDS.keyBy(jsonObj -> jsonObj.getString("id"));
         
@@ -111,7 +111,7 @@ public class DwsTradeProvinceOrderWindow{
                     }
                 }
         );
-        //distinctDS.print();
+        distinctDS.print();
         //TODO 4.指定Watermark以及提取事件时间字段
         SingleOutputStreamOperator<JSONObject> withWatermarkDS = distinctDS.assignTimestampsAndWatermarks(
                 WatermarkStrategy
@@ -153,7 +153,8 @@ public class DwsTradeProvinceOrderWindow{
         KeyedStream<TradeProvinceOrderBean, String> provinceIdKeyedDS = beanDS.keyBy(TradeProvinceOrderBean::getProvinceId);
 
         //TODO 7.开窗
-        WindowedStream<TradeProvinceOrderBean, String, TimeWindow> windowDS = provinceIdKeyedDS.window(TumblingEventTimeWindows.of(org.apache.flink.streaming.api.windowing.time.Time.seconds(10)));
+        WindowedStream<TradeProvinceOrderBean, String, TimeWindow> windowDS = provinceIdKeyedDS.window(TumblingEventTimeWindows.of(
+                org.apache.flink.streaming.api.windowing.time.Time.seconds(10)));
 
         //TODO 8.聚合
         SingleOutputStreamOperator<TradeProvinceOrderBean> reduceDS = windowDS.reduce(
@@ -180,7 +181,7 @@ public class DwsTradeProvinceOrderWindow{
                     }
                 }
         );
-        reduceDS.print();
+//        reduceDS.print();
         //TODO 9.关联省份维度
         SingleOutputStreamOperator<TradeProvinceOrderBean> withProvinceDS = AsyncDataStream.unorderedWait(
                 reduceDS,
@@ -202,12 +203,12 @@ public class DwsTradeProvinceOrderWindow{
                 60,
                 TimeUnit.SECONDS
         );
-        withProvinceDS.print();
+//        withProvinceDS.print();
 
         //TODO 10.将关联的结果写到Doris中
-        withProvinceDS
-                .map(new BeanToJsonStrMapFunction<>())
-                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_province_order_window"));
+//        withProvinceDS
+//                .map(new BeanToJsonStrMapFunction<>())
+//                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_province_order_window"));
 
         env.execute();
     }

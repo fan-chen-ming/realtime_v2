@@ -217,7 +217,7 @@ public class DwsTradeSkuOrderWindow {
                 TimeUnit.SECONDS
         );
 
-        //withSkuInfoDS.print();
+//        withSkuInfoDS.print();
         //TODO 10.关联spu维度
         SingleOutputStreamOperator<TradeSkuOrderBean> withSpuInfoDS = AsyncDataStream.unorderedWait(
                 withSkuInfoDS,
@@ -334,12 +334,12 @@ public class DwsTradeSkuOrderWindow {
                 TimeUnit.SECONDS
         );
 
-        withC1DS.print("======>");
+//        withC1DS.print("======>");
 
         //TODO 15.将关联的结果写到Doris表中
-        withC1DS
-                .map(new BeanToJsonStrMapFunction<>())
-                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_sku_order_window"));
+//        withC1DS
+//                .map(new BeanToJsonStrMapFunction<>())
+//                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_sku_order_window"));
 
         env.execute();
     }

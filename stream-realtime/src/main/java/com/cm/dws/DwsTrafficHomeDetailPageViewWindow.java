@@ -169,9 +169,9 @@ public class DwsTrafficHomeDetailPageViewWindow {
                 }
         );
         reduceDS.print();
-        reduceDS
-                .map(new BeanToJsonStrMapFunction<TrafficHomeDetailPageViewBean>())
-                .sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_home_detail_page_view_window"));
+//        reduceDS
+//                .map(new BeanToJsonStrMapFunction<TrafficHomeDetailPageViewBean>())
+//                .sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_home_detail_page_view_window"));
 
 
 
