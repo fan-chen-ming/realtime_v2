@@ -1,6 +1,7 @@
 package com.cm.dws;
 
 
+
 import com.cm.constant.Constant;
 import com.cm.dws.function.KeywordUDTF;
 import lombok.SneakyThrows;
@@ -45,7 +46,7 @@ public class DwsTrafficSourceKeywordPageViewWindow {
                 " watermark for et as et - interval '5' second " +
                 ")WITH (\n" +
                 "  'connector' = 'kafka',\n" +
-                "  'topic' = 'dwd_xinyi_jiao_page',\n" +
+                "  'topic' = 'dwd_traffic_page_chenming',\n" +
                 "  'properties.bootstrap.servers' = 'cdh02:9092',\n" +
                 "  'properties.group.id' = 'testGroup',\n" +
                 "  'scan.startup.mode' = 'earliest-offset',\n" +

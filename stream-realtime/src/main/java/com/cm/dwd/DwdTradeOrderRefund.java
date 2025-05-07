@@ -1,6 +1,7 @@
 package com.cm.dwd;
 
 
+
 import com.cm.constant.Constant;
 import com.cm.util.SQLUtil;
 import lombok.SneakyThrows;
@@ -84,16 +85,14 @@ public class DwdTradeOrderRefund {
         Table result = tenv.sqlQuery(
                 "select " +
                         "ri.id," +
-                        "ri.user_id," +
-                        "ri.order_id," +
                         "ri.sku_id," +
                         "oi.province_id," +
                         "date_format(FROM_UNIXTIME(CAST(ri.create_time AS BIGINT) / 1000), 'yyyy-MM-dd') AS date_id," +
                         "ri.create_time," +
-                        "ri.refund_type," +
-                        "dic1.info.dic_name," +
-                        "ri.refund_reason_type," +
-                        "dic2.info.dic_name," +
+                        "ri.refund_type as refund_type_code," +
+                        "dic1.info.dic_name as refund_type_name," +
+                        "ri.refund_reason_type as refund_reason_type_code," +
+                        "dic2.info.dic_name as refund_reason_type_name," +
                         "ri.refund_reason_txt," +
                         "ri.refund_num," +
                         "ri.refund_amount," +
@@ -106,11 +105,12 @@ public class DwdTradeOrderRefund {
                         "join base_dic for system_time as of ri.proc_time as dic2 " +
                         "on ri.refund_reason_type=dic2.dic_code ");
 
-                tenv.toChangelogStream(result).print();
+//                tenv.toChangelogStream(result).print();
 //
 //        // 5. 写出到 kaf ka
         tenv.executeSql(
                 "create table dwd_trade_order_refund (" +
+                        "id string," +
                         "sku_id string," +
                         "province_id string," +
                         "date_id string," +

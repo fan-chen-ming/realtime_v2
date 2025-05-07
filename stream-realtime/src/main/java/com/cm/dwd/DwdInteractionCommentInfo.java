@@ -1,6 +1,7 @@
 package com.cm.dwd;
 
 
+
 import com.cm.constant.Constant;
 import com.cm.util.SQLUtil;
 import lombok.SneakyThrows;
@@ -80,7 +81,7 @@ public class DwdInteractionCommentInfo{
                 "FROM comment_info AS c \n" +
                 "  left join hbase as dic \n" +
                 "  ON c.appraise = dic.dic_code;");
-        table3.execute().print();
+//        table3.execute().print();
 //
 
         tenv.executeSql("CREATE TABLE "+ Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO+" (\n" +

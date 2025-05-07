@@ -1,6 +1,7 @@
 package com.cm.dwd;
 
 
+
 import com.cm.constant.Constant;
 import com.cm.util.SQLUtil;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -52,7 +53,7 @@ public class DwdTradeCartAdd {
                 " or \n" +
                 " (op='u' and `before`['sku_num'] is not null and (CAST(`after`['sku_num'] AS INT) > CAST(`before`['sku_num'] AS INT))) \n" +
                 ") ");
-        cartInfo.execute().print();
+//        cartInfo.execute().print();
 
         //TODO 将过滤出来的加购数据写到Kafka主题中
         //创建动态表和要写入的主题映射

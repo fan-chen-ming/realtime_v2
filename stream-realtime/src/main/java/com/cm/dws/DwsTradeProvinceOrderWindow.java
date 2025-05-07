@@ -2,6 +2,7 @@ package com.cm.dws;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
 import com.cm.bean.TradeProvinceOrderBean;
 import com.cm.dws.function.BeanToJsonStrMapFunction;
 import com.cm.dws.function.CustomStringDeserializationSchema;
@@ -9,13 +10,6 @@ import com.cm.function.DimAsyncFunction;
 import com.cm.util.DateFormatUtil;
 import com.cm.util.FlinkSinkUtil;
 import lombok.SneakyThrows;
-import org.apache.flink.api.common.restartstrategy.RestartStrategies;
-import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.streaming.api.CheckpointingMode;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.environment.CheckpointConfig;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -25,7 +19,10 @@ import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.*;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
@@ -206,9 +203,9 @@ public class DwsTradeProvinceOrderWindow{
 //        withProvinceDS.print();
 
         //TODO 10.将关联的结果写到Doris中
-//        withProvinceDS
-//                .map(new BeanToJsonStrMapFunction<>())
-//                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_province_order_window"));
+        withProvinceDS
+                .map(new BeanToJsonStrMapFunction<>())
+                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_province_order_window"));
 
         env.execute();
     }

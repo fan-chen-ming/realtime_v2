@@ -1,10 +1,12 @@
 package com.cm.dwd.log;
+
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import com.cm.base.BaseApp;
 import com.cm.constant.Constant;
-import com.cm.util.DateFormatUtil;
 import com.cm.util.FlinkSinkUtil;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;

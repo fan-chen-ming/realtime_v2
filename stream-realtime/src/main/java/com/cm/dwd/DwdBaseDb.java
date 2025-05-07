@@ -1,8 +1,11 @@
 package com.cm.dwd;
 
+
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cm.base.BaseApp;
+import com.cm.bean.BaseDbTableProcessFunction;
 import com.cm.bean.TableProcessDwd;
 import com.cm.constant.Constant;
 import com.cm.util.FlinkSinkUtil;
@@ -23,7 +26,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.util.Collector;
-import org.apache.hadoop.fs.shell.Concat;
+
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -172,10 +175,10 @@ public class DwdBaseDb extends BaseApp {
         );
 //        splitDS.print();
 
-//        SingleOutputStreamOperator<Tuple2<JSONObject, TableProcessDwd>> splitDS1 = connectDS.process(new BaseDbTableProcessFunction(mapStateDescriptor));
-////        splitDS1.print();
-////
-//        splitDS1.sinkTo(FlinkSinkUtil.getFlinkSinkUtil());
+        SingleOutputStreamOperator<Tuple2<JSONObject, TableProcessDwd>> splitDS1 = connectDS.process(new BaseDbTableProcessFunction(mapStateDescriptor));
+//        splitDS1.print();
+//
+        splitDS1.sinkTo(FlinkSinkUtil.getFlinkSinkUtil());
     }
     //这个辅助方法用于删除JSON对象中不需要的列，只保留配置中指定的列。
     private static void deleteNoeedColumns(JSONObject dataJsonObj, String sinkColumns) {

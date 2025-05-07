@@ -1,7 +1,6 @@
 package com.cm.dws.function;
 
 
-
 import com.cm.util.KeywordUtil;
 import org.apache.flink.table.annotation.DataTypeHint;
 import org.apache.flink.table.annotation.FunctionHint;

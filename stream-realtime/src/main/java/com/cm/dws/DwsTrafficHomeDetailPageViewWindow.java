@@ -60,7 +60,7 @@ public class DwsTrafficHomeDetailPageViewWindow {
 
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers("cdh02:9092")
-                .setTopics("dwd_xinyi_jiao_page")
+                .setTopics("dwd_traffic_page_chenming")
                 .setGroupId("my-group")
                 .setStartingOffsets(OffsetsInitializer.earliest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
@@ -169,9 +169,9 @@ public class DwsTrafficHomeDetailPageViewWindow {
                 }
         );
         reduceDS.print();
-//        reduceDS
-//                .map(new BeanToJsonStrMapFunction<TrafficHomeDetailPageViewBean>())
-//                .sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_home_detail_page_view_window"));
+        reduceDS
+                .map(new BeanToJsonStrMapFunction<TrafficHomeDetailPageViewBean>())
+                .sinkTo(FlinkSinkUtil.getDorisSink("dws_traffic_home_detail_page_view_window"));
 
 
 

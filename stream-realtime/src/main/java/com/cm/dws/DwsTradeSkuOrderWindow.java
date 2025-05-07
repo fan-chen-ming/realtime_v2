@@ -1,6 +1,7 @@
 package com.cm.dws;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
 import com.cm.bean.TradeSkuOrderBean;
 import com.cm.dws.function.BeanToJsonStrMapFunction;
 import com.cm.dws.function.CustomStringDeserializationSchema;
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @Package com.cm.dws.DwsTradeSkuOrderWindow
  * @Author chen.ming
  * @Date 2025/4/16 14:34
- * @description:
+ * @description: sku粒度下单业务过程聚合统计
  */
 public class DwsTradeSkuOrderWindow {
     public static void main(String[] args) throws Exception {
@@ -57,7 +58,7 @@ public class DwsTradeSkuOrderWindow {
         env.setRestartStrategy(RestartStrategies.failureRateRestart(3, Time.days(30),Time.seconds(3)));
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers("cdh02:9092")
-                .setTopics("dwd_trade_order_detail")
+                .setTopics("dwd_trade_order_detail_chenming")
                 .setGroupId("my-group")
                 .setProperty("consumer.ignore.invalid.records", "true") // 跳过无效记录
                 .setStartingOffsets(OffsetsInitializer.earliest())
@@ -75,7 +76,7 @@ public class DwsTradeSkuOrderWindow {
                     }
                 }
         );
-        jsonObjDS.print();
+//        jsonObjDS.print();
         //TODO 2.按照唯一键(订单明细的id)进行分组
         KeyedStream<JSONObject, String> orderDetailIdKeyedDS = jsonObjDS.keyBy(jsonObj -> jsonObj.getString("id"));
 //        orderDetailIdKeyedDS.print();
@@ -123,7 +124,7 @@ public class DwsTradeSkuOrderWindow {
                                 new SerializableTimestampAssigner<JSONObject>() {
                                     @Override
                                     public long extractTimestamp(JSONObject jsonObj, long recordTimestamp) {
-                                        return jsonObj.getLong("ts_ms") * 1000;
+                                        return jsonObj.getLong("ts") * 1000;
                                     }
                                 }
                         )
@@ -142,7 +143,7 @@ public class DwsTradeSkuOrderWindow {
                         BigDecimal splitCouponAmount = jsonObj.getBigDecimal("split_coupon_amount");
                         BigDecimal splitActivityAmount = jsonObj.getBigDecimal("split_activity_amount");
                         BigDecimal splitTotalAmount = jsonObj.getBigDecimal("split_total_amount");
-                        Long ts = jsonObj.getLong("ts_ms") * 1000;
+                        Long ts = jsonObj.getLong("ts") * 1000;
                         TradeSkuOrderBean orderBean = TradeSkuOrderBean.builder()
                                 .skuId(skuId)
                                 .originalAmount(splitOriginalAmount)
@@ -159,7 +160,7 @@ public class DwsTradeSkuOrderWindow {
 
         //TODO 6.分组
         KeyedStream<TradeSkuOrderBean, String> skuIdKeyedDS = beanDS.keyBy(TradeSkuOrderBean::getSkuId);
-        skuIdKeyedDS.print();
+//        skuIdKeyedDS.print();
         //TODO 7.开窗
         WindowedStream<TradeSkuOrderBean, String, TimeWindow> windowDS = skuIdKeyedDS.window(TumblingProcessingTimeWindows.of(org.apache.flink.streaming.api.windowing.time.Time.seconds(10)));
 
@@ -217,7 +218,7 @@ public class DwsTradeSkuOrderWindow {
                 TimeUnit.SECONDS
         );
 
-//        withSkuInfoDS.print();
+        //withSkuInfoDS.print();
         //TODO 10.关联spu维度
         SingleOutputStreamOperator<TradeSkuOrderBean> withSpuInfoDS = AsyncDataStream.unorderedWait(
                 withSkuInfoDS,
@@ -336,10 +337,10 @@ public class DwsTradeSkuOrderWindow {
 
 //        withC1DS.print("======>");
 
-        //TODO 15.将关联的结果写到Doris表中
-//        withC1DS
-//                .map(new BeanToJsonStrMapFunction<>())
-//                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_sku_order_window"));
+//        //TODO 15.将关联的结果写到Doris表中
+        withC1DS
+                .map(new BeanToJsonStrMapFunction<>())
+                .sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_sku_order_window"));
 
         env.execute();
     }

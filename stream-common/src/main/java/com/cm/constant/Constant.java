@@ -39,5 +39,5 @@ public class Constant {
 
     public static final String DORIS_FE_NODES = "10.160.60.14:8030";
 
-    public static final String DORIS_DATABASE = "dev_chen_ming_v1";
+    public static final String DORIS_DATABASE = "realtime_v2_chen_ming";
 }

@@ -13,6 +13,7 @@
     <modules>
         <module>stream-common</module>
         <module>stream-realtime</module>
+        <module>stream-sensitive</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>

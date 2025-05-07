@@ -96,7 +96,7 @@ public class DwdTradeOrderCancelDetail {
                         "from dwd_trade_order_detail od " +
                         "join order_cancel oc " +
                         "on od.order_id=oc.id ");
-        tenv.toChangelogStream(result).print();
+//        tenv.toChangelogStream(result).print();
         //TODO 将关联的结果写到kafka主题中
         tenv.executeSql(
                 "create table dwd_trade_order_cancel(" +

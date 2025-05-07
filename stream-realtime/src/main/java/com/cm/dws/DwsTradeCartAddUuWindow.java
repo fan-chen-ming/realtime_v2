@@ -2,6 +2,7 @@ package com.cm.dws;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
 import com.cm.base.BaseApp;
 import com.cm.bean.CartAddUuBean;
 import com.cm.constant.Constant;
@@ -29,7 +30,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 /**
- * @Package com.cm.dws.DwsTradeCartAddUuWindow
+ * @Package com.cm.dws.DwsTradeProvinceOrderWindow
  * @Author chen.ming
  * @Date 2025/4/16 8:37
  * @description: 加购独立用户统计
@@ -92,7 +93,7 @@ public class DwsTradeCartAddUuWindow extends BaseApp {
                 }
         );
         //{"user_id":"76","sku_id":"30","id":"144","ts_ms":1744338076756}
-        cartUUDS.print("cart-->");
+//        cartUUDS.print("cart-->");
         //TODO 5.开窗
         AllWindowedStream<JSONObject, TimeWindow> windowDS
                 = cartUUDS.windowAll(TumblingEventTimeWindows.of(org.apache.flink.streaming.api.windowing.time.Time.seconds(1)));
@@ -138,23 +139,18 @@ public class DwsTradeCartAddUuWindow extends BaseApp {
                     }
                 }
         );
-
-
-
-//        aggregateDS.print();
-
-
         //TODO 7.将聚合的结果写到Doris
         //CartAddUuBean(stt=2025-04-16 09:46:56, edt=2025-04-16 09:46:57, curDate=2025-04-16, cartAddUuCt=12)
-//        SingleOutputStreamOperator<String> map = aggregateDS
-//                .map(new MapFunction<CartAddUuBean, String>() {
-//                    @Override
-//                    public String map(CartAddUuBean cartAddUuBean) throws Exception {
-//                        return JSON.toJSONString(cartAddUuBean);
-//                    }
-//                });
+//        aggregateDS.print();
+        SingleOutputStreamOperator<String> map = aggregateDS
+                .map(new MapFunction<CartAddUuBean, String>() {
+                    @Override
+                    public String map(CartAddUuBean cartAddUuBean) throws Exception {
+                        return JSON.toJSONString(cartAddUuBean);
+                    }
+                });
         //{"cartAddUuCt":7,"curDate":"2025-04-15","edt":"2025-04-15 21:43:41","stt":"2025-04-15 21:43:40"}
-//        map.print("map-->");
-//        map.sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_cart_add_uu_window"));
+        map.print("map-->");
+        map.sinkTo(FlinkSinkUtil.getDorisSink("dws_trade_cart_add_uu_window"));
     }
 }
