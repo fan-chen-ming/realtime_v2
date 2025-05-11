@@ -10,6 +10,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @Author chen.ming
  * @Date 2025/4/13 18:42
  * @description: 交易域支付成功事务事实表
+ * Kafka数据 -> 支付数据过滤 -> 订单数据关联 -> 字典数据关联 -> Kafka存储
  */
 public class DwdTradeOrderPaySucDetail {
     @SneakyThrows
@@ -126,7 +127,7 @@ public class DwdTradeOrderPaySucDetail {
                         "and od.et <= pi.et + interval '5' second " +
                         "join base_dic for system_time as of pi.proc_time as dic " +
                         "on pi.payment_type=dic.dic_code ");
-        tenv.toChangelogStream(result).print();
+//        tenv.toChangelogStream(result).print();
 
         //TODO 将关联的结果写到kafka主题中
         tenv.executeSql("create table dwd_trade_order_payment_success(" +
@@ -158,6 +159,7 @@ public class DwdTradeOrderPaySucDetail {
                 "  'value.format' = 'json'\n" +
                 ")");
         result.executeInsert("dwd_trade_order_payment_success");
+
 
         env.execute();
     }

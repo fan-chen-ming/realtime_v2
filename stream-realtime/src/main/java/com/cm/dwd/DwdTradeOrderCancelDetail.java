@@ -10,6 +10,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @Author chen.ming
  * @Date 2025/4/11 19:00
  * @description: 取消订单表
+ * Kafka数据 -> 订单取消过滤 -> 订单详情关联 -> 数据转换 -> Kafka存储
  */
 public class DwdTradeOrderCancelDetail {
     @SneakyThrows
@@ -17,7 +18,7 @@ public class DwdTradeOrderCancelDetail {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         StreamTableEnvironment tenv = StreamTableEnvironment.create(env);
-    //TODO 从kafka的topic_db主题中读取数据
+    //TODO 从kafka的chenming_db主题中读取数据
         tenv.executeSql("" +
                 "CREATE TABLE db (\n" +
                 "  `before` MAP<string,string>,\n" +

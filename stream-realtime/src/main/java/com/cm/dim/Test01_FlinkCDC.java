@@ -15,7 +15,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import java.util.Properties;
 
 /**
- * @Package com.cm.dim.function.Test01_FlinkCDC
+ * @Package com.cm.dim.Test01_FlinkCDC
  * @Author chen.ming
  * @Date 2025/5/2 14:33
  * @description:
@@ -23,6 +23,7 @@ import java.util.Properties;
 public class Test01_FlinkCDC {
     @SneakyThrows
     public static void main(String[] args)  {
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         //并行度
         env.setParallelism(4);
@@ -42,7 +43,7 @@ public class Test01_FlinkCDC {
                 .tableList("realtime_v1.*") // 设置捕获的表
                 .username("root")
                 .password("Zh1028,./")
-                .startupOptions(StartupOptions.initial())
+                .startupOptions(StartupOptions.initial()) //监控增量
                 .deserializer(new JsonDebeziumDeserializationSchema()) // 将 SourceRecord 转换为 JSON 字符串
                 .build();
 
@@ -51,7 +52,7 @@ public class Test01_FlinkCDC {
         env.enableCheckpointing(3000);
 
 
-        //从源创建数据流
+        //从源创建数据流                                                     //表示不使用水印，即没有基于时间的处理需求
         DataStreamSource<String> mySQLSource = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "MySQL Source");
 
         mySQLSource.print();
@@ -60,11 +61,11 @@ public class Test01_FlinkCDC {
         KafkaSink<String> sink = KafkaSink.<String>builder()
                 .setBootstrapServers("cdh01:9092")
                 .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                        .setTopic("chenming_db")
-                        .setValueSerializationSchema(new SimpleStringSchema())
-                        .build()
+                                .setTopic("chenming_db")
+                                .setValueSerializationSchema(new SimpleStringSchema())
+                                .build()
                 )
-                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)//：至少一次投递语义，防止数据丢失。
                 .build();
 
         mySQLSource.sinkTo(sink);

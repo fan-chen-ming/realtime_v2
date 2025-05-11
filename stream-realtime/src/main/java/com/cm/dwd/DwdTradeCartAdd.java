@@ -13,6 +13,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @Author chen.ming
  * @Date 2025/4/11 9:08
  * @description: 加购事实表
+ * Kafka数据 -> 加购数据过滤 -> 数据转换 -> Kafka存储
  */
 public class DwdTradeCartAdd {
     public static void main(String[] args) {
@@ -20,12 +21,12 @@ public class DwdTradeCartAdd {
         env.setParallelism(1);
 
         StreamTableEnvironment tenv = StreamTableEnvironment.create(env);
-        //TODO 从Kafka的xinyi_jiao_yw主题中读取数据 创建动态表
+        //TODO 从Kafka的chenming_db主题中读取数据 创建动态表
         tenv.executeSql("" +
                 "CREATE TABLE db (\n" +
                 "  `before` MAP<string,string>,\n" +
                 "  `after` Map<String,String>,\n" +
-                "   `source` Map<String,String>,\n" +
+                "  `source` Map<String,String>,\n" +
                 "  `op`  String,\n" +
                 "  `ts_ms`  bigint,\n" +
                 "  `proc_time`  AS proctime()\n "+
@@ -63,11 +64,11 @@ public class DwdTradeCartAdd {
                 "  sku_id STRING,\n" +
                 "  sku_num STRING,\n" +
                 "  ts_ms BIGINT,\n" +
-                "  PRIMARY KEY (id) NOT ENFORCED\n" +
+                "  PRIMARY KEY (id) NOT ENFORCED\n" + //不强制约束
                 ")"+ SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_TRADE_CART_ADD));
         //写入
         Table table = tenv.sqlQuery("select * from dwd_trade_cart_add_chenming");
-        tenv.toChangelogStream(table).print();
+//        tenv.toChangelogStream(table).print();
         cartInfo.executeInsert(Constant.TOPIC_DWD_TRADE_CART_ADD);
 
     }

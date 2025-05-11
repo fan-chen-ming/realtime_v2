@@ -24,9 +24,9 @@ public class DwdTradeRefundPaySucDetail {
                 "  source  Map<String,String>,\n" +
                 "  op  String,\n" +
                 "  ts_ms  bigint,\n" +
-                "  proc_time  AS proctime(),\n "+
+                "  proc_time  AS proctime(),\n "+ // 添加一个处理时间
                 "  et AS TO_TIMESTAMP_LTZ(ts_ms, 3),\n" +
-                "  WATERMARK FOR et AS et - INTERVAL '3' SECOND\n" +
+                "  WATERMARK FOR et AS et - INTERVAL '3' SECOND\n" + //处理乱序数据 提高执行效率
                 ") WITH (\n" +
                 "  'connector' = 'kafka',\n" +
                 "  'topic' = 'chenming_db',\n" +

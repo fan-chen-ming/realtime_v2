@@ -14,6 +14,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @Author chen.ming
  * @Date 2025/4/11 10:32
  * @description: 用户评论表
+ * Kafka数据 -> 数据过滤 -> 维度关联 -> 数据转换 -> Kafka存储
  */
 public class DwdInteractionCommentInfo{
     @SneakyThrows
@@ -74,9 +75,9 @@ public class DwdInteractionCommentInfo{
                 " id," +
                 "user_id," +
                 "sku_id," +
-                "appraise," +
+                "appraise," +//评分
                 "dic.dic_name as appraise_name," + //评分名称
-                "comment_txt," +
+                "comment_txt," +//内容
                 "ts \n" +
                 "FROM comment_info AS c \n" +
                 "  left join hbase as dic \n" +
@@ -88,9 +89,9 @@ public class DwdInteractionCommentInfo{
                 "    id string,\n" +
                 "    user_id string,\n" +
                 "    sku_id string,\n" +
-                "    appraise string,\n" + // 评分
-                "    appraise_name string,\n" + // 评分名称
-                "    comment_txt string,\n" + // 评论内容为
+                "    appraise string,\n" +
+                "    appraise_name string,\n" +
+                "    comment_txt string,\n" +
                 "    ts bigint,\n" +
                 "    PRIMARY KEY (id) NOT ENFORCED\n" +
                 ") " + SQLUtil.getUpsertKafkaDDL(Constant.TOPIC_DWD_INTERACTION_COMMENT_INFO));

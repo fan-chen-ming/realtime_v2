@@ -19,6 +19,7 @@ public class Constant {
     public static final String MYSQL_PASSWORD = "Zh1028,./";
     public static final String HBASE_NAMESPACE = "ns_chenming";
 
+
     public static final String MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final String MYSQL_URL = "jdbc:mysql://10.160.60.17:3306?useSSL=false";
 
@@ -40,4 +41,11 @@ public class Constant {
     public static final String DORIS_FE_NODES = "10.160.60.14:8030";
 
     public static final String DORIS_DATABASE = "realtime_v2_chen_ming";
+
+
+    public static final String TOPIC_GL = "realtime_v2_db";
+    public static final String TOPIC_FACT = "chenming_fact_comment_db";
+    public static final String TOPIC_RESULT_SENSTITVE = "chenming_result_sensitive_words_user";
+    public static  final  String TOPIC_API="sk-hmyaxwbimmieijvocwynneoblhkfbqevyhzkjvabcvhecfgm";
+    public static final  String TOPIC_API_ADDR="https://api.siliconflow.cn/v1/chat/completions";
 }

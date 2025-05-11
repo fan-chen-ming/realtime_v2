@@ -32,7 +32,7 @@ import org.apache.hadoop.hbase.client.Connection;
 import java.util.*;
 
 /**
- * @Package com.cm.dim.function.DimApp
+ * @Package com.cm.dim.DimApp
  * @Author chen.ming
  * @Date 2025/4/8 08:52
  * @description: 1
@@ -63,7 +63,7 @@ public class DimApp {
         env.getCheckpointConfig().setCheckpointStorage("hdfs://cdh01:8020/2207A/chenming/Flink");
         // 设置操作hadoop用户
         System.setProperty("HADOOP_USER_NAME","root");
-        // TODO 3.从Kafka的topic_db主题中读取业务数据
+        // TODO 3.从Kafka的chenming_db主题中读取业务数据
         // 3.1 声明消费的主题以及消费者组
         String groupId = "dim_app_group";
 

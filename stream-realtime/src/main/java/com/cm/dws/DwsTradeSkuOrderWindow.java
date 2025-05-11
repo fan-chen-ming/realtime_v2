@@ -97,6 +97,7 @@ public class DwsTradeSkuOrderWindow {
                     public void processElement(JSONObject jsonObj, KeyedProcessFunction<String, JSONObject, JSONObject>.Context ctx, Collector<JSONObject> out) throws Exception {
                         //从状态中获取上次接收到的数据
                         JSONObject lastJsonObj = lastJsonObjState.value();
+
                         if (lastJsonObj != null) {
                             //说明重复了 ，将已经发送到下游的数据(状态)，影响到度量值的字段进行取反再传递到下游
                             String splitOriginalAmount = lastJsonObj.getString("split_original_amount");

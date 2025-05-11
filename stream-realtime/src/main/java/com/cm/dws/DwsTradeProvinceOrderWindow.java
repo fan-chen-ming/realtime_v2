@@ -59,7 +59,7 @@ public class DwsTradeProvinceOrderWindow{
 //        env.setRestartStrategy(RestartStrategies.failureRateRestart(3, Time.days(30),Time.seconds(3)));
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers("cdh02:9092")
-                .setTopics("dwd_trade_order_detail")
+                .setTopics("dwd_trade_order_detail_chenming")
                 .setGroupId("my-group")
                 .setProperty("consumer.ignore.invalid.records", "true") // 跳过无效记录
                 .setStartingOffsets(OffsetsInitializer.earliest())
@@ -77,7 +77,7 @@ public class DwsTradeProvinceOrderWindow{
                     }
                 }
         );
-        jsonObjDS.print();
+//        jsonObjDS.print();
         //TODO 2.按照唯一键(订单明细的id)进行分组
         KeyedStream<JSONObject, String> orderDetailIdKeyedDS = jsonObjDS.keyBy(jsonObj -> jsonObj.getString("id"));
         
@@ -108,7 +108,7 @@ public class DwsTradeProvinceOrderWindow{
                     }
                 }
         );
-        distinctDS.print();
+//        distinctDS.print();
         //TODO 4.指定Watermark以及提取事件时间字段
         SingleOutputStreamOperator<JSONObject> withWatermarkDS = distinctDS.assignTimestampsAndWatermarks(
                 WatermarkStrategy
@@ -117,7 +117,7 @@ public class DwsTradeProvinceOrderWindow{
                                 new SerializableTimestampAssigner<JSONObject>() {
                                     @Override
                                     public long extractTimestamp(JSONObject jsonObj, long recordTimestamp) {
-                                        return jsonObj.getLong("ts_ms") ;
+                                        return jsonObj.getLong("ts") ;
                                     }
                                 }
                         )
@@ -132,7 +132,7 @@ public class DwsTradeProvinceOrderWindow{
                         // "split_activity_amount":"500.0","split_total_amount":"6499.0","ts":1718278525}
                         String provinceId = jsonObj.getString("province_id");
                         BigDecimal splitTotalAmount = jsonObj.getBigDecimal("split_total_amount");
-                        Long ts = jsonObj.getLong("ts_ms");
+                        Long ts = jsonObj.getLong("ts");
                         String orderId = jsonObj.getString("order_id");
 
                         TradeProvinceOrderBean orderBean = TradeProvinceOrderBean.builder()

@@ -11,6 +11,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @Author chen.ming
  * @Date 2025/4/11 15:30
  * @description: 订单表 订单明细(主表) 订单明细活动 订单明细优惠券 下单事实表
+ * Kafka数据 -> 多表数据过滤 -> 数据关联 -> 金额计算 -> Kafka存储
  */
 public class DwdTradeOrderDetail {
     @SneakyThrows

@@ -138,7 +138,7 @@ public class HBaseUtil {
             throw new RuntimeException(e);
         }
     }
-// TODO 李珂琰到此一游  啦啦啦 写这么多你不要命了
+// TODO 1
 public static <T>T getRow(Connection hbaseConn, String namespace, String tableName, String rowKey,Class<T> clz,boolean... isUnderlineToCamel){
     boolean defaultIsUToC = false;  // 默认不执行下划线转驼峰
 

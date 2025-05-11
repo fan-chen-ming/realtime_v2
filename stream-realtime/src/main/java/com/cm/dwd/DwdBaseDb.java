@@ -38,7 +38,8 @@ import java.util.*;
  * @Package com.cm.dwd.DwdBaseDb
  * @Author chen.ming
  * @Date 2025/4/13 19:06
- * @description: 开发思路分析的 /从Kafka读取数据流，并根据MySQL中的配置动态地处理这些数据。处理过程中涉及到了数据的解析、过滤、转换以及广播状态的应用。
+ * @description: 开发思路分析的 /从Kafka读取数据流，
+ * 并根据MySQL中的配置动态地处理这些数据。处理过程中涉及到了数据的解析、过滤、转换以及广播状态的应用。
  */
 public class DwdBaseDb extends BaseApp {
     public static void main(String[] args) throws Exception {
@@ -94,7 +95,7 @@ public class DwdBaseDb extends BaseApp {
                     }
                 }
         );
-//        tpDS.print();
+        tpDS.print();
 //        TableProcessDwd(sourceTable=favor_info, sourceType=insert, sinkTable=dwd_interaction_favor_add, sinkColumns=id,user_id,sku_id,create_time, op=r)
 //        TableProcessDwd(sourceTable=coupon_use, sourceType=update, sinkTable=dwd_tool_coupon_use, sinkColumns=id,coupon_id,user_id,order_id,using_time,used_time,coupor, op=r)
 //        将MySQL中的配置信息作为广播状态，以便在处理每个Kafka消息时都能访问到最新的配置。

@@ -63,7 +63,7 @@ public class DwdBaseLog  extends BaseApp {
         KeyedStream<JSONObject, String> keyedDs = jsonObjDS.keyBy(jsonObject -> jsonObject.getJSONObject("common").getString("mid"));
         // 使用Flink的状态编程完成修复
         SingleOutputStreamOperator<JSONObject> fiexdDs = keyedDs.map(new RichMapFunction<JSONObject, JSONObject>() {
-            private ValueState<String> listVisitDateState;
+                private ValueState<String> listVisitDateState;
             @Override
             public void open(Configuration parameters) throws Exception {
                 ValueStateDescriptor<String> valueStateDescriptor = new ValueStateDescriptor<String>("listVisitDateState", String.class);
@@ -135,7 +135,7 @@ public class DwdBaseLog  extends BaseApp {
                             //曝光日志
                             JSONArray displayArr = jsonObj.getJSONArray("displays");
                             if (displayArr != null && displayArr.size() > 0) {
-                                //便利当前页面的所有曝光信息
+                                //遍历当前页面的所有曝光信息
                                 for (int i = 0; i < displayArr.size(); i++) {
                                     JSONObject dispalyJSonObj = displayArr.getJSONObject(i);
                                     //定义一个新的json对象,用于封装遍历出来的 曝光数据

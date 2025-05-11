@@ -14,6 +14,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @Author chen.ming
  * @Date 2025/4/13 19:29
  * @description: 交易域退单事务事实表
+ * Kafka数据 -> 退单数据过滤 -> 订单数据关联 -> 字典数据关联 -> Kafka存储
  */
 public class DwdTradeOrderRefund {
     @SneakyThrows
