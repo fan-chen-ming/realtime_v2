@@ -21,6 +21,7 @@ import java.util.Properties;
  * @description:
  */
 public class Test01_FlinkCDC {
+
     @SneakyThrows
     public static void main(String[] args)  {
 
@@ -61,7 +62,7 @@ public class Test01_FlinkCDC {
         KafkaSink<String> sink = KafkaSink.<String>builder()
                 .setBootstrapServers("cdh01:9092")
                 .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                                .setTopic("chenming_db")
+                                .setTopic("`chenming_db`")
                                 .setValueSerializationSchema(new SimpleStringSchema())
                                 .build()
                 )
