@@ -9,6 +9,7 @@ package com.cm.constant;
 
 public class Constant {
     public static final String KAFKA_BROKERS = "cdh01:9092,cdh02:9092,cdh03:9092";
+    public static final String kafka_botstrap_servers = "cdh01:9092,cdh02:9092,cdh03:9092";
 
     public static final String TOPIC_DB = "chenming_db";
     public static final String TOPIC_LOG = "chenming_log";
@@ -21,11 +22,12 @@ public class Constant {
 
 
     public static final String MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
-    public static final String MYSQL_URL = "jdbc:mysql://10.160.60.17:3306?useSSL=false";
+    public static final String MYSQL_URL = "jdbc:mysql://10.160.60.17:3306?&useSSL=false";
 
     public static final String TOPIC_DWD_TRAFFIC_START = "dwd_traffic_start_chenming";
+
     public static final String TOPIC_DWD_TRAFFIC_ERR = "dwd_traffic_err_chenming";
-    public static final String TOPIC_DWD_TRAFFIC_PAGE = "dwd_traffic_page_chenming";
+    public static final String TOPIC_DWD_TRAFFIC_PAGE = "page_info_chenming";
     public static final String TOPIC_DWD_TRAFFIC_ACTION = "dwd_traffic_action_chenming";
     public static final String TOPIC_DWD_TRAFFIC_DISPLAY = "dwd_traffic_display_chenming";
     public static final String TOPIC_DWD_INTERACTION_COMMENT_INFO = "dwd_interaction_comment_info_chenming";

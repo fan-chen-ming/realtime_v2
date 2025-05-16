@@ -22,7 +22,7 @@ public class FlinkSourceUtil {
 //在生产环境中，一般为了保证消费的精准一次性，需要手动维护偏移量，KafkaSource->KafkaSourceReader->存储偏移量
               .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
               //从最末尾位点开始消费
-              .setStartingOffsets(OffsetsInitializer.latest())
+              .setStartingOffsets(OffsetsInitializer.earliest())
 
               .setValueOnlyDeserializer(new DeserializationSchema<String>() {
                   @Override

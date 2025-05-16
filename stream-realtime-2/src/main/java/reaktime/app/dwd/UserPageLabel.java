@@ -71,7 +71,7 @@ public class UserPageLabel {
         //todo 获取kafka主题数据
         //todo 从 Kafka 读取 CDC 变更数据，创建一个字符串类型的数据流
         SingleOutputStreamOperator<String> kafkaSourceDs = env.fromSource(
-                FlinkSourceUtil.getKafkaSource("chenming_log", "kafka_source_page_info"),
+                FlinkSourceUtil.getKafkaSource("page_info_chenming", "kafka_source_page_info"),
                 WatermarkStrategy.<String>forBoundedOutOfOrderness(Duration.ofSeconds(3))
                         .withTimestampAssigner((event, timestamp) -> {
                                     JSONObject jsonObject = JSONObject.parseObject(event);
@@ -94,6 +94,7 @@ public class UserPageLabel {
         SingleOutputStreamOperator<JSONObject> mapKafkaSourceDs = kafkaSourceDs.map(JSONObject::parseObject);
         //mapKafkaSourceDs.print("mapKafkaSourceDs ->");
 
+        //映射页面信息字段
         SingleOutputStreamOperator<JSONObject> mapPageInfoDs = mapKafkaSourceDs.map(new MapPageInfoFacility())
                 .uid("map page info").name("kafka source page info");
         //mapPageInfoDs.print("mapPageInfoDs -> ");
@@ -106,15 +107,16 @@ public class UserPageLabel {
 
         //mapPageInfoDs -> > {"uid":"332","deviceInfo":{"ar":"31","uid":"332","os":"iOS","ch":"Appstore","md":"iPhone 14","vc":"v2.1.134","ba":"iPhone"},"ts":1744212138255}
         //mapPageInfoDs -> > {"uid":"332","deviceInfo":{"ar":"31","uid":"332","os":"iOS","ch":"Appstore","md":"iPhone 14","vc":"v2.1.134","ba":"iPhone"},"ts":1744212151506}
+        //去重
         SingleOutputStreamOperator<JSONObject> processStagePageLogDs = keyedStreamLogPageMsg.process(new ProcessFilterRepeatTsData());
         //processStagePageLogDs.print("processStagePageLogDs ->");
 
-        // 2 min 分钟窗口
+        // 2 min 分钟窗口     窗口聚合处理
         SingleOutputStreamOperator<JSONObject> win2MinutesPageLogsDs = processStagePageLogDs.keyBy(data -> data.getString("uid"))
-                .process(new AggregateUserDataProcessFunction())
+                .process(new AggregateUserDataProcessFunction()) //聚合用户行为数据。
                 .keyBy(data -> data.getString("uid"))
                 .window(TumblingProcessingTimeWindows.of(Time.minutes(2)))
-                .reduce((value1, value2) -> value2)
+                .reduce((value1, value2) -> value2)   //使用 reduce 操作保留最新一条记录。
                 .uid("win 2 minutes page count msg")
                 .name("win 2 minutes page count msg");
         //win2MinutesPageLogsDs.print("win2MinutesPageLogsDs ->");

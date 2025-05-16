@@ -3,6 +3,7 @@ package reaktime.app.dwd;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cm.constant.Constant;
+import com.cm.util.FlinkSinkUtil;
 import com.cm.util.FlinkSourceUtil;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -57,15 +58,16 @@ public class UserSixBaseDb {
                 .name("Kafka_cdc_Source");
 //        kafkaStrDS.print();
 
-
+       //JSON 解析
         SingleOutputStreamOperator<JSONObject> dataConvertJsonDs = kafkaStrDS.map(JSON::parseObject)
                 .uid("convert json")
                 .name("convert json");
-
+        //过滤 user_info 表的数据
         SingleOutputStreamOperator<JSONObject> userInfoDs = dataConvertJsonDs.filter(data -> data.getJSONObject("source").getString("table").equals("user_info"))
                 .uid("filter kafka user info")
                 .name("filter kafka user info");
 
+        //格式化 birthday 字段
         SingleOutputStreamOperator<JSONObject> finalUserInfoDs = userInfoDs.map( new RichMapFunction<JSONObject, JSONObject>() {
             @Override
             public JSONObject map(JSONObject jsonObject){
@@ -87,7 +89,7 @@ public class UserSixBaseDb {
         SingleOutputStreamOperator<JSONObject> userInfoSupDs = dataConvertJsonDs.filter(data -> data.getJSONObject("source").getString("table").equals("user_info_sup_msg"))
                 .uid("filter kafka user info sup")
                 .name("filter kafka user info sup");
-
+//映射用户主信息字段
         SingleOutputStreamOperator<JSONObject> mapUserInfoDs = finalUserInfoDs.map(new RichMapFunction<JSONObject, JSONObject>() {
                     @Override
                     public JSONObject map(JSONObject jsonObject){
@@ -108,6 +110,7 @@ public class UserSixBaseDb {
                                 try {
                                     LocalDate birthday = LocalDate.parse(birthdayStr, DateTimeFormatter.ISO_DATE);
                                     LocalDate currentDate = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+                                    // 计算 age, decade, zodiac_sign
                                     int age = calculateAge(birthday, currentDate);
                                     int decade = birthday.getYear() / 10 * 10;
                                     result.put("decade", decade);
@@ -127,13 +130,14 @@ public class UserSixBaseDb {
 
 //        mapUserInfoDs.print();
 
-
+         //映射用户补充信息字段
         SingleOutputStreamOperator<JSONObject> mapUserInfoSupDs = userInfoSupDs.map(new RichMapFunction<JSONObject, JSONObject>() {
                     @Override
                     public JSONObject map(JSONObject jsonObject) {
                         JSONObject result = new JSONObject();
                         if (jsonObject.containsKey("after") && jsonObject.getJSONObject("after") != null) {
                             JSONObject after = jsonObject.getJSONObject("after");
+                            // 提取 uid, height, weight, create_ts 等补充字段
                             result.put("uid", after.getString("uid"));
                             result.put("unit_height", after.getString("unit_height"));
                             result.put("create_ts", after.getLong("create_ts"));
@@ -150,7 +154,7 @@ public class UserSixBaseDb {
 //        mapUserInfoSupDs.print();
 
         SingleOutputStreamOperator<JSONObject> finalUserinfoDs = mapUserInfoDs.filter(data -> data.containsKey("uid") && !data.getString("uid").isEmpty());
-        SingleOutputStreamOperator<JSONObject> finalUserinfoSupDs = mapUserInfoSupDs.filter(data -> data.containsKey("uid") && !data.getString("uid").isEmpty());
+        SingleOutputStreamOperator<JSONObject> finalUserinfoSupDs = mapUserInfoSupDs.filter(data -> data.containsKey("uid")&&!data.getString("uid").isEmpty() );
 
         KeyedStream<JSONObject, String> keyedStreamUserInfoDs = finalUserinfoDs.keyBy(data -> data.getString("uid"));
         KeyedStream<JSONObject, String> keyedStreamUserInfoSupDs = finalUserinfoSupDs.keyBy(data -> data.getString("uid"));
@@ -160,12 +164,16 @@ public class UserSixBaseDb {
                 .process(new IntervalJoinUserInfoLabelProcessFunc());
 
             processIntervalJoinUserInfo6BaseMessageDs.print();
+        processIntervalJoinUserInfo6BaseMessageDs.map(JSONObject::toString).sinkTo(FlinkSinkUtil.getFlinkSinkUtil("dwd_base6_label_cm"));
 
 
+
+        // 输出 格式csv
+//        userInfoSupDs.writeAsText("C:\\chenming/output.csv").setParallelism(1);
         env.execute("UserSixBaseDb");
     }
 
-
+//辅助方法：计算年龄
     private static int calculateAge(LocalDate birthDate, LocalDate currentDate) {
         return Period.between(birthDate, currentDate).getYears();
     }

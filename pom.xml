@@ -14,6 +14,7 @@
         <module>stream-common</module>
         <module>stream-realtime</module>
         <module>stream-sensitive</module>
+        <module>stream-realtime-2</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>

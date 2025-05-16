@@ -207,17 +207,17 @@ public class UserOderInfoLabel {
             }
         });
         //mapSkuInfoDs.print("mapSkuInfoDs ->");
-
+        //空值过滤
         SingleOutputStreamOperator<JSONObject> filterNotNullCdcOrderInfoDs = mapOrderInfoDs.filter(data -> data.getString("id") != null && !data.getString("id").isEmpty());
         SingleOutputStreamOperator<JSONObject> filterNotNullCdcOrderDetailDs = mapOrderDetailDs.filter(data -> data.getString("order_id") != null && !data.getString("order_id").isEmpty());
         SingleOutputStreamOperator<JSONObject> filterNotNullCdcSkuInfoDs = mapSkuInfoDs.filter(data -> data.getString("id") != null && !data.getString("id").isEmpty());
         SingleOutputStreamOperator<JSONObject> filterNotNullCdcBaseTrademarkDs = mapBaseTrademarkDs.filter(data -> data.getString("id") != null && !data.getString("id").isEmpty());
-
+       //KeyBy 分组
         KeyedStream<JSONObject, String> keyedOrderInfoDs = filterNotNullCdcOrderInfoDs.keyBy(data -> data.getString("id"));
         KeyedStream<JSONObject, String> keyedOrderDetailDs = filterNotNullCdcOrderDetailDs.keyBy(data -> data.getString("order_id"));
         KeyedStream<JSONObject, String> keyedSkuInfoDs = filterNotNullCdcSkuInfoDs.keyBy(data -> data.getString("id"));
         KeyedStream<JSONObject, String> keyedBaseTrademark = filterNotNullCdcBaseTrademarkDs.keyBy(data -> data.getString("id"));
-
+       //Interval Join：订单信息与订单详情
         SingleOutputStreamOperator<JSONObject> processOrderInfoJoinOrderDetail = keyedOrderInfoDs.intervalJoin(keyedOrderDetailDs)
                 .between(Time.minutes(-2), Time.minutes(2))
                 .process(new ProcessJoinFunction<JSONObject, JSONObject, JSONObject>() {
@@ -235,7 +235,7 @@ public class UserOderInfoLabel {
                     }
                 });
         //processOrderInfoJoinOrderDetail.print("processOrderInfoJoinOrderDetail ->");
-
+         //Interval Join：订单详情与 SKU 信息
         SingleOutputStreamOperator<JSONObject> processOrderJoinSkuInfo = processOrderInfoJoinOrderDetail.keyBy(data -> data.getString("sku_id")).intervalJoin(keyedSkuInfoDs)
                 .between(Time.minutes(-2), Time.minutes(2))
                 .process(new ProcessJoinFunction<JSONObject, JSONObject, JSONObject>() {
@@ -251,7 +251,7 @@ public class UserOderInfoLabel {
                     }
                 });
         //processOrderJoinSkuInfo.print("processOrderJoinSkuInfo ->");
-
+             //Interval Join：SKU 信息与品牌信息
         SingleOutputStreamOperator<JSONObject> processSkuInfoJoinBaseTrademark = processOrderJoinSkuInfo.keyBy(data -> data.getString("tm_id")).intervalJoin(keyedBaseTrademark)
                 .between(Time.minutes(-2), Time.minutes(2))
                 .process(new ProcessJoinFunction<JSONObject, JSONObject, JSONObject>() {
@@ -266,7 +266,7 @@ public class UserOderInfoLabel {
                     }
                 });
         //processSkuInfoJoinBaseTrademark.print("processSkuInfoJoinCategory ->");
-
+          //根据订单行为打标签（类目、品牌、价格、时间偏好）。
         SingleOutputStreamOperator<JSONObject> mapOrderInfoAndDetailModelDs = processSkuInfoJoinBaseTrademark.map(new MapCategoryAndTrademarkAndPriceAndTimeFunc(dim_base_categories, category_rate_weight_coefficient, trademark_rate_weight_coefficient,price_rate_weight_coefficient,time_rate_weight_coefficient));
         mapOrderInfoAndDetailModelDs.print("mapOrderInfoAndDetailModelDs ->");
 
@@ -289,10 +289,11 @@ public class UserOderInfoLabel {
 
         mapOrderInfoAndDetailModelDs.map(JSONObject::toString).sinkTo(FlinkSinkUtil.getFlinkSinkUtil("dwd_order_info_base_chenming"));
 
+
         env.disableOperatorChaining();
         env.execute("DbCdcOrderInfoBaseLabel");
     }
-
+//辅助方法：价格区间判断
     private static String obtainThePriceRange(BigDecimal originalTotalAmount) {
         double priceRange = originalTotalAmount.doubleValue();
         if (priceRange < 1000) return "低价商品";
@@ -302,6 +303,7 @@ public class UserOderInfoLabel {
 
 
     private static String obtainTheTimePeriod(int hour) {
+        //根据小时数判断时间段（凌晨 / 早晨 / 上午 / 中午 / 下午 / 晚上 / 夜间）。
         if(hour < 6)        return "凌晨";
         else if(hour < 9)   return "早晨";
         else if(hour < 12)  return "上午";

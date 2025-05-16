@@ -62,7 +62,7 @@ public class Test01_FlinkCDC {
         KafkaSink<String> sink = KafkaSink.<String>builder()
                 .setBootstrapServers("cdh01:9092")
                 .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                                .setTopic("`chenming_db`")
+                                .setTopic("chenming_db")
                                 .setValueSerializationSchema(new SimpleStringSchema())
                                 .build()
                 )
