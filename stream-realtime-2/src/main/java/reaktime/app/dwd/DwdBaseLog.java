@@ -57,6 +57,7 @@ public class DwdBaseLog {
 
         OutputTag<String> dirtyTag = new OutputTag<String>("dirtyTag"){};
 
+
         SingleOutputStreamOperator<JSONObject> jsonObjDS = kafkaStrDS.process(
                 new ProcessFunction<String, JSONObject>() {
                     @Override
