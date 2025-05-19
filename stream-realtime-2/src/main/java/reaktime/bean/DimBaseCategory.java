@@ -17,6 +17,7 @@ import java.io.Serializable;
 @Data
 public class DimBaseCategory implements Serializable {
     private String id;
+
     private String b3name;
     private String b2name;
     private String b1name;
