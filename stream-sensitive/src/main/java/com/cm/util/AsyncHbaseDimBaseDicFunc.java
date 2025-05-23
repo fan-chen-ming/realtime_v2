@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class AsyncHbaseDimBaseDicFunc extends RichAsyncFunction<JSONObject,JSONObject> {
 
+
     private transient Connection hbaseConn;
     private transient Table dimTable;
     // 缓存：RowKey -> dic_name
