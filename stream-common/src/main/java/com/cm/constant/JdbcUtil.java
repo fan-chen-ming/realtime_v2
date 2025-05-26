@@ -38,6 +38,7 @@ public class JdbcUtil {
             defaultIsUToC = isUnderlineToCamel[0];
         }
 
+
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         ResultSetMetaData metaData = rs.getMetaData();
