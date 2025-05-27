@@ -42,6 +42,7 @@ public class JdbcUtil {
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         ResultSetMetaData metaData = rs.getMetaData();
+
         while (rs.next()){
             //创建一个对象,用于接收查询结果
             T obj = clz.newInstance();
